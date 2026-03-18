@@ -1,23 +1,20 @@
-from sentence_transformers import SentenceTransformer
-import faiss
 import numpy as np
 
-# 加载模型
-model = SentenceTransformer('all-MiniLM-L6-v2')
-
-# 读取知识库
+# 简单文本
 with open("data.txt", "r", encoding="utf-8") as f:
     docs = f.readlines()
 
-# 向量化
-embeddings = model.encode(docs)
+# 简单向量（长度）
+def text_to_vec(text):
+    return np.array([len(text)])
 
-# 建立索引
-index = faiss.IndexFlatL2(embeddings.shape[1])
-index.add(np.array(embeddings))
+doc_vectors = [text_to_vec(doc) for doc in docs]
 
-# 查询函数
 def search(query):
-    q_emb = model.encode([query])
-    D, I = index.search(np.array(q_emb), k=1)
-    return docs[I[0][0]]
+    q_vec = text_to_vec(query)
+
+    scores = [np.dot(q_vec, d) for d in doc_vectors]
+
+    best_idx = np.argmax(scores)
+
+    return docs[best_idx]
