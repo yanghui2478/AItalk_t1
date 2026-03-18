@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI问答系统</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f6fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .answer {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f1f1f1;
+            border-radius: 6px;
+            min-height: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+    <h2>🤖 AI聊天</h2>
+
+    <div id="chat" style="height:300px; overflow-y:auto; border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+    </div>
+
+    <input type="text" id="question" placeholder="请输入问题...">
+    <button onclick="ask()">发送</button>
+</div>
+
+    <script>
+        document.getElementById("question").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        ask();
+    }
+});
+
+        async function ask() {
+    const question = document.getElementById("question").value;
+
+    // 显示用户消息
+    addMessage("你", question);
+
+    document.getElementById("question").value = "";
+
+    const response = await fetch("http://127.0.0.1:8000/ask", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ question: question })
+    });
+
+    const data = await response.json();
+
+    // 显示AI回答
+    addMessage("AI", data.answer);
+}
+
+// 添加消息到页面
+function addMessage(sender, text) {
+    const chat = document.getElementById("chat");
+
+    const msg = document.createElement("div");
+    msg.style.marginBottom = "10px";
+
+    msg.innerHTML = "<b>" + sender + "：</b>" + text;
+
+    chat.appendChild(msg);
+
+    chat.scrollTop = chat.scrollHeight;
+}
+
+
+    </script>
+</body>
+</html>
